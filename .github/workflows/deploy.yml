@@ -24,7 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: databricks/setup-cli@main
+      - name: Install legacy CLI
+        run: pip install databricks-cli==0.17.7
       - name: Upload notebooks to Databricks
         run: |
           databricks workspace mkdirs /Users/naav230@gmail.com/sddatabricks
-          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks
+          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks --overwrite
