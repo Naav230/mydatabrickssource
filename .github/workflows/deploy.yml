@@ -19,18 +19,39 @@ jobs:
 
       - name: Upload mydatabrickscodes to workspace
         run: |
-          for nb in $(find mydatabrickscodes -name '*.py'); do
-            rel_path=${nb#mydatabrickscodes/}
-            target="/Users/naav230@gmail.com/mydatabrickscodes/${rel_path%.py}"
+          for file in $(find mydatabrickscodes -type f); do
+            rel_path=${file#mydatabrickscodes/}
+            target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
             databricks workspace mkdirs "$(dirname "$target")"
-            databricks workspace import "$nb" "$target" --overwrite --format SOURCE
+            
+            # Detect file extension and choose import format
+            ext="${file##*.}"
+            if [[ "$ext" == "py" ]]; then
+              format="SOURCE"
+            elif [[ "$ext" == "ipynb" ]]; then
+              format="JUPYTER"
+            else
+              format="FILE"
+            fi
+
+            databricks workspace import "$file" "$target" --overwrite --format $format
           done
 
       - name: Upload mydatasource to workspace
         run: |
-          for nb in $(find mydatasource -name '*.py'); do
-            rel_path=${nb#mydatasource/}
-            target="/Users/naav230@gmail.com/mydatasource/${rel_path%.py}"
+          for file in $(find mydatasource -type f); do
+            rel_path=${file#mydatasource/}
+            target="/Users/naav230@gmail.com/mydatasource/$rel_path"
             databricks workspace mkdirs "$(dirname "$target")"
-            databricks workspace import "$nb" "$target" --overwrite --format SOURCE
+            
+            ext="${file##*.}"
+            if [[ "$ext" == "py" ]]; then
+              format="SOURCE"
+            elif [[ "$ext" == "ipynb" ]]; then
+              format="JUPYTER"
+            else
+              format="FILE"
+            fi
+
+            databricks workspace import "$file" "$target" --overwrite --format $format
           done
