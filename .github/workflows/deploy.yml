@@ -1,22 +1,14 @@
 name: Sync Git Folder
 
-concurrency: dev_environment
-
 on:
   push:
     branches:
-      # Set your base branch name here
       - main
-
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     name: 'Update git folder'
-    environment: dev
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
@@ -24,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: databricks/setup-cli@main
-      # 3. Upload contents of mydatabrickscodes/
+
       - name: Upload mydatabrickscodes to workspace
         run: |
           for nb in $(find mydatabrickscodes -name '*.py'); do
@@ -34,7 +26,6 @@ jobs:
             databricks workspace import "$nb" "$target" --overwrite --format SOURCE
           done
 
-      # 4. Upload contents of mydatasource/
       - name: Upload mydatasource to workspace
         run: |
           for nb in $(find mydatasource -name '*.py'); do
