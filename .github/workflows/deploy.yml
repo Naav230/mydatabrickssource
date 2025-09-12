@@ -24,17 +24,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: databricks/setup-cli@main
-      - name: Upload notebooks (preserve folders)
+      # 3. Upload contents of mydatabrickscodes/
+      - name: Upload mydatabrickscodes to workspace
         run: |
-          for nb in $(find notebooks -name '*.py'); do
-            # Strip leading 'notebooks/' to keep relative path
-            rel_path=${nb#notebooks/}
-            # Remove file extension for Databricks notebook name
-            base_name=$(basename "$rel_path" .py)
-            # Build target path in Databricks
-            target="/Users/naav230@gmail.com/sddatabricks/${rel_path%.py}"
-            # Make sure parent directory exists
+          for nb in $(find mydatabrickscodes -name '*.py'); do
+            rel_path=${nb#mydatabrickscodes/}
+            target="/Users/naav230@gmail.com/mydatabrickscodes/${rel_path%.py}"
             databricks workspace mkdirs "$(dirname "$target")"
-            # Import notebook
+            databricks workspace import "$nb" "$target" --overwrite --format SOURCE
+          done
+
+      # 4. Upload contents of mydatasource/
+      - name: Upload mydatasource to workspace
+        run: |
+          for nb in $(find mydatasource -name '*.py'); do
+            rel_path=${nb#mydatasource/}
+            target="/Users/naav230@gmail.com/mydatasource/${rel_path%.py}"
+            databricks workspace mkdirs "$(dirname "$target")"
             databricks workspace import "$nb" "$target" --overwrite --format SOURCE
           done
