@@ -19,8 +19,47 @@ jobs:
 
       - name: Install Databricks CLI compatible with Community Edition
         run: |
-          pip install databricks-cli==0.170.0
+          pip install databricks-cli==0.18.0
 
       - name: Upload mydatabrickscodes folder
         run: |
-          find mydatabrickscodes -type f | wh
+          find mydatabrickscodes -type f | while read -r file; do
+            rel_path="${file#mydatabrickscodes/}"
+            target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
+
+            # Create parent directory
+            databricks workspace mkdirs "$(dirname "$target")"
+
+            # Determine file format
+            ext="${file##*.}"
+            if [[ "$ext" == "py" ]]; then
+              format="SOURCE"
+            elif [[ "$ext" == "ipynb" ]]; then
+              format="JUPYTER"
+            else
+              format="FILE"
+            fi
+
+            # Import the file (CSV files are treated as FILE)
+            databricks workspace import "$file" "$target" --format "$format" --overwrite
+          done
+
+      - name: Upload mydatasource folder
+        run: |
+          find mydatasource -type f | while read -r file; do
+            rel_path="${file#mydatasource/}"
+            target="/Users/naav230@gmail.com/mydatasource/$rel_path"
+
+            databricks workspace mkdirs "$(dirname "$target")"
+
+            ext="${file##*.}"
+            if [[ "$ext" == "py" ]]; then
+              format="SOURCE"
+            elif [[ "$ext" == "ipynb" ]]; then
+              format="JUPYTER"
+            else
+              format="FILE"
+            fi
+
+            databricks workspace import "$file" "$target" --format "$format" --overwrite
+          done
