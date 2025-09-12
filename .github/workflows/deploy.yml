@@ -22,4 +22,8 @@ jobs:
 
       - name: Upload mydatabrickscodes folder
         run: |
-          databricks workspace import_dir mydatabrickscodes /Users/naav230@gmail.com/mydatabrickscodes --overwrite
+          databricks workspace import_dir mydatabrickscodes /Users/naav230@gmail.com/mydatabrickscodes
+
+      - name: Upload mydatasource folder
+        run: |
+          databricks workspace import_dir mydatasource /Users/naav230@gmail.com/mydatasource
