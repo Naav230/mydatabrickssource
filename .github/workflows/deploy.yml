@@ -27,4 +27,4 @@ jobs:
       - name: Upload notebooks to Databricks
         run: |
           databricks workspace mkdirs /Users/naav230@gmail.com/sddatabricks
-          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks --overwrite
+          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks
