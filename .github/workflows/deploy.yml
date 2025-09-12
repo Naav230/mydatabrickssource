@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: databricks/setup-cli@main
-      - name: Update git folder
-        # Set your workspace path and branch name here
-        run: databricks repos update /Workspace/Users/naav230@gmail.com/sddatabricks --branch git-folder-cicd-example
+      - name: Upload notebooks to Databricks
+        run: |
+          databricks workspace mkdirs /Users/naav230@gmail.com/sddatabricks
+          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks --overwrite
