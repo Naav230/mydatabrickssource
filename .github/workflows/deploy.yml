@@ -22,27 +22,4 @@ jobs:
 
       - name: Upload mydatabrickscodes folder
         run: |
-          find mydatabrickscodes -type f | while read -r file; do
-            rel_path="${file#mydatabrickscodes/}"
-            target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
-
-            # Create parent directory in Databricks workspace
-            databricks workspace mkdirs "$(dirname "$target")"
-
-            # Determine import format
-            ext="${file##*.}"
-            if [[ "$ext" == "py" ]]; then
-              format="SOURCE"
-            elif [[ "$ext" == "ipynb" ]]; then
-              format="JUPYTER"
-            else
-              format="FILE"
-            fi
-
-            # Import file to Databricks workspace
-            databricks workspace import "$file" "$target" --overwrite --format "$format"
-          done
-
-      - name: Upload mydatasource folder
-        run: |
-          find mydatasource -type f | w
+          databricks workspace import_dir mydatabrickscodes /Users/naav230@gmail.com/mydatabrickscodes --overwrite
