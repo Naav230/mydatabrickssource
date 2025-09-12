@@ -1,4 +1,4 @@
-name: Sync Git Folder
+name: Sync Git Folders to Databricks Community Edition
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: 'Update Databricks workspace'
+    name: 'Upload folders to Databricks workspace'
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
@@ -17,13 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Databricks CLI
-        uses: databricks/setup-cli@main
+      - name: Install Databricks CLI compatible with Community Edition
+        run: |
+          pip install databricks-cli==0.170.0
 
       - name: Upload mydatabrickscodes folder
         run: |
-          databricks workspace import_dir mydatabrickscodes /Users/naav230@gmail.com/mydatabrickscodes
-
-      - name: Upload mydatasource folder
-        run: |
-          databricks workspace import_dir mydatasource /Users/naav230@gmail.com/mydatasource
+          find mydatabrickscodes -type f | wh
