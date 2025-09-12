@@ -8,24 +8,27 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: 'Update git folder'
+    name: 'Update Databricks workspace'
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: databricks/setup-cli@main
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Upload mydatabrickscodes to workspace
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Upload mydatabrickscodes folder
         run: |
           find mydatabrickscodes -type f | while read -r file; do
             rel_path="${file#mydatabrickscodes/}"
             target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
-            
-            # Create target directory
+
+            # Create parent directory in Databricks workspace
             databricks workspace mkdirs "$(dirname "$target")"
-            
+
             # Determine import format
             ext="${file##*.}"
             if [[ "$ext" == "py" ]]; then
@@ -36,26 +39,10 @@ jobs:
               format="FILE"
             fi
 
-            # Import file
+            # Import file to Databricks workspace
             databricks workspace import "$file" "$target" --overwrite --format "$format"
           done
 
-      - name: Upload mydatasource to workspace
+      - name: Upload mydatasource folder
         run: |
-          find mydatasource -type f | while read -r file; do
-            rel_path="${file#mydatasource/}"
-            target="/Users/naav230@gmail.com/mydatasource/$rel_path"
-            
-            databricks workspace mkdirs "$(dirname "$target")"
-            
-            ext="${file##*.}"
-            if [[ "$ext" == "py" ]]; then
-              format="SOURCE"
-            elif [[ "$ext" == "ipynb" ]]; then
-              format="JUPYTER"
-            else
-              format="FILE"
-            fi
-
-            databricks workspace import "$file" "$target" --overwrite --format "$format"
-          done
+          find mydatasource -type f | w
