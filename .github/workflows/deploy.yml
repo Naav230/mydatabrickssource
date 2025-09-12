@@ -24,9 +24,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: databricks/setup-cli@main
-      - name: Install legacy CLI
-        run: pip install databricks-cli==0.17.7
-      - name: Upload notebooks to Databricks
+      - name: Upload notebooks (preserve folders)
         run: |
-          databricks workspace mkdirs /Users/naav230@gmail.com/sddatabricks
-          databricks workspace import_dir ./notebooks /Users/naav230@gmail.com/sddatabricks --overwrite
+          for nb in $(find notebooks -name '*.py'); do
+            # Strip leading 'notebooks/' to keep relative path
+            rel_path=${nb#notebooks/}
+            # Remove file extension for Databricks notebook name
+            base_name=$(basename "$rel_path" .py)
+            # Build target path in Databricks
+            target="/Users/naav230@gmail.com/sddatabricks/${rel_path%.py}"
+            # Make sure parent directory exists
+            databricks workspace mkdirs "$(dirname "$target")"
+            # Import notebook
+            databricks workspace import "$nb" "$target" --overwrite --format SOURCE
+          done
