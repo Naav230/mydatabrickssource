@@ -19,12 +19,14 @@ jobs:
 
       - name: Upload mydatabrickscodes to workspace
         run: |
-          for file in $(find mydatabrickscodes -type f); do
-            rel_path=${file#mydatabrickscodes/}
+          find mydatabrickscodes -type f | while read -r file; do
+            rel_path="${file#mydatabrickscodes/}"
             target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
+            
+            # Create target directory
             databricks workspace mkdirs "$(dirname "$target")"
             
-            # Detect file extension and choose import format
+            # Determine import format
             ext="${file##*.}"
             if [[ "$ext" == "py" ]]; then
               format="SOURCE"
@@ -34,14 +36,16 @@ jobs:
               format="FILE"
             fi
 
-            databricks workspace import "$file" "$target" --overwrite --format $format
+            # Import file
+            databricks workspace import "$file" "$target" --overwrite --format "$format"
           done
 
       - name: Upload mydatasource to workspace
         run: |
-          for file in $(find mydatasource -type f); do
-            rel_path=${file#mydatasource/}
+          find mydatasource -type f | while read -r file; do
+            rel_path="${file#mydatasource/}"
             target="/Users/naav230@gmail.com/mydatasource/$rel_path"
+            
             databricks workspace mkdirs "$(dirname "$target")"
             
             ext="${file##*.}"
@@ -53,5 +57,5 @@ jobs:
               format="FILE"
             fi
 
-            databricks workspace import "$file" "$target" --overwrite --format $format
+            databricks workspace import "$file" "$target" --overwrite --format "$format"
           done
