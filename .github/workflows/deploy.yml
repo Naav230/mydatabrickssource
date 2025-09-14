@@ -1,71 +1,29 @@
-name: Sync Git Folders to Databricks Community Edition
+name: Sync Git Folder
+
+concurrency: dev_environment
 
 on:
   push:
     branches:
-      - main
+      # Set your base branch name here
+      - git-folder-cicd-example
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: 'Upload folders to Databricks workspace'
+    name: 'Update git folder'
+    environment: dev
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Databricks CLI compatible with Community Edition
-        run: |
-          pip install databricks-cli==0.18.0
-
-      - name: Configure Databricks CLI
-        run: |
-          echo "[DEFAULT]" > ~/.databrickscfg
-          echo "host = ${DATABRICKS_HOST}" >> ~/.databrickscfg
-          echo "token = ${DATABRICKS_TOKEN}" >> ~/.databrickscfg
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-
-      - name: Upload mydatabrickscodes folder
-        run: |
-          find mydatabrickscodes -type f | while read -r file; do
-            rel_path="${file#mydatabrickscodes/}"
-            target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
-
-            databricks workspace mkdirs "$(dirname "$target")"
-
-            ext="${file##*.}"
-            if [[ "$ext" == "py" ]]; then
-              format="SOURCE"
-            elif [[ "$ext" == "ipynb" ]]; then
-              format="JUPYTER"
-            else
-              format="FILE"
-            fi
-
-            databricks workspace import "$file" "$target" --format "$format" --overwrite
-          done
-
-      - name: Upload mydatasource folder
-        run: |
-          find mydatasource -type f | while read -r file; do
-            rel_path="${file#mydatasource/}"
-            target="/Users/naav230@gmail.com/mydatasource/$rel_path"
-
-            databricks workspace mkdirs "$(dirname "$target")"
-
-            ext="${file##*.}"
-            if [[ "$ext" == "py" ]]; then
-              format="SOURCE"
-            elif [[ "$ext" == "ipynb" ]]; then
-              format="JUPYTER"
-            else
-              format="FILE"
-            fi
-
-            databricks workspace import "$file" "$target" --format "$format" --overwrite
-          done
+      - uses: actions/checkout@v3
+      - uses: databricks/setup-cli@main
+      - name: Update git folder
+        # Set your workspace path and branch name here
+        run: databricks repos update /Workspace/Sonjoy --branch git-folder-cicd-example
