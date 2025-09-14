@@ -24,11 +24,12 @@ jobs:
       - name: Configure Databricks CLI
         run: |
           mkdir -p ~/.databricks
-          cat <<EOF > ~/.databrickscfg
-          [DEFAULT]
-          host = $DATABRICKS_HOST
-          token = $DATABRICKS_TOKEN
-          EOF
+          echo "[DEFAULT]" > ~/.databrickscfg
+          echo "host = ${DATABRICKS_HOST}" >> ~/.databrickscfg
+          echo "token = ${DATABRICKS_TOKEN}" >> ~/.databrickscfg
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
       - name: Upload mydatabrickscodes folder
         run: |
@@ -36,10 +37,8 @@ jobs:
             rel_path="${file#mydatabrickscodes/}"
             target="/Users/naav230@gmail.com/mydatabrickscodes/$rel_path"
 
-            # Create parent directory
             databricks workspace mkdirs "$(dirname "$target")"
 
-            # Determine file format
             ext="${file##*.}"
             if [[ "$ext" == "py" ]]; then
               format="SOURCE"
@@ -49,7 +48,6 @@ jobs:
               format="FILE"
             fi
 
-            # Import the file (CSV, TXT, JSON etc. are treated as FILE)
             databricks workspace import "$file" "$target" --format "$format" --overwrite
           done
 
