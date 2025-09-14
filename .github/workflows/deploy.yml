@@ -20,9 +20,14 @@ jobs:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
-    steps:
+        steps:
       - uses: actions/checkout@v3
+
       - uses: databricks/setup-cli@main
-      - name: Update git folder
-        # Set your workspace path and branch name here
-        run: databricks repos update /Workspace/Sonjoy --branch git-folder-cicd-example
+
+      - name: Upload notebooks to Databricks workspace
+        run: |
+          databricks workspace import-dir \
+            ./notebooks \
+            /Workspace/Sonjoy \
+            --overwrite
