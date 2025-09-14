@@ -28,6 +28,6 @@ jobs:
       - name: Upload notebooks to Databricks workspace
         run: |
           databricks workspace import-dir \
-            ./notebooks \
+            ./mydatabrickscodes \
             /Workspace/Sonjoy \
             --overwrite
