@@ -1,18 +1,14 @@
 name: Sync Git Folder
 
-concurrency: dev_environment
-
 on:
-  push:
-    branches:
-      main
-
-permissions:
-  id-token: write
-  contents: read
+  workflow_run:
+    workflows: ["Build"]   
+    types:
+      - completed
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # only if build succeeds
     runs-on: ubuntu-latest
     name: 'Update git folder'
     environment: dev
@@ -22,9 +18,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - uses: databricks/setup-cli@main
-
       - name: Upload notebooks to Databricks workspace
         run: |
           databricks workspace import-dir \
