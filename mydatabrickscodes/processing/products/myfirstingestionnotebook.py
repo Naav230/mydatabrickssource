@@ -84,3 +84,7 @@ Test this
 # COMMAND ----------
 
 pip install
+
+# COMMAND ----------
+
+a<>b
