@@ -54,3 +54,25 @@ def very_bad_function(a, b, c, d, e, f):
 
 x = 10
 print(y) 
+
+# COMMAND ----------
+
+def hello1():
+    print("Hello world")
+
+def hello2():
+    print("Hello world")
+
+# COMMAND ----------
+
+DB_PASSWORD = "supersecret123"
+
+# COMMAND ----------
+
+def do_nothing():
+    pass
+
+# COMMAND ----------
+
+# def old_function():
+#     print("this is old")
