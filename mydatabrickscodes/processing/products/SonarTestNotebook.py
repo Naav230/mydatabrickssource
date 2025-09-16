@@ -24,9 +24,9 @@ def duplicate_code_example(x):
 
 def bad_naming_function():
     # variables with bad naming
-    a <> 10
-    b <> 20
-    c <> 30
+    a = 10
+    b = 20
+    c = 30
     return a + b + c
 
 def bare_except_example():
