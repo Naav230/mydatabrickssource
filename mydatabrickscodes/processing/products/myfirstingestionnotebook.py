@@ -80,3 +80,11 @@ def do_nothing():
 # COMMAND ----------
 
 Test this
+
+# COMMAND ----------
+
+pip install
+
+# COMMAND ----------
+
+a<>b
