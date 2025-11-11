@@ -1,32 +1,22 @@
-name: Run Databricks Notebook on Pull Request
+steps:
+  - uses: actions/checkout@v3
+  - uses: databricks/setup-cli@main
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
-jobs:
-  run-notebook:
-    runs-on: ubuntu-latest
+  - name: Check if Databricks workspace path exists
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+    run: |
+      TARGET_PATH="/Workspace/Sonjoy"
+      PARENT_FOLDER=$(dirname "$TARGET_PATH")
+      FOLDER_NAME=$(basename "$TARGET_PATH")
 
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Databricks CLI
-        uses: databricks/setup-cli@main
-
-      - name: Run Databricks Notebook
-        run: |
-          databricks runs submit --json '{
-            "run_name": "PR Trigger Run",
-            "new_cluster": {
-              "spark_version": "13.3.x-scala2.12",
-              "node_type_id": "Standard_DS3_v2",
-              "num_workers": 2
-            },
-            "notebook_task": {
-              "notebook_path": "/Workspace/Sonjoy/processing/products/myfirstingestionnotebook"
-            }
-          }'
+      echo "Checking if $TARGET_PATH exists in Databricks workspace..."
+      
+      # List the parent folder and search for the target folder
+      if databricks workspace list "$PARENT_FOLDER" | grep -q "$FOLDER_NAME"; then
+        echo "Folder $TARGET_PATH exists."
+      else
+        echo "Folder $TARGET_PATH does NOT exist!"
+        exit 1
+      fi
