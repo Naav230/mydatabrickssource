@@ -15,16 +15,10 @@ jobs:
       - name: Install Databricks CLI
         run: pip install databricks-cli
 
-      - name: Configure Databricks CLI
-        run: |
-          mkdir -p ~/.databricks
-          cat <<EOF > ~/.databricks/config
-          [DEFAULT]
-          host = ${{ secrets.DATABRICKS_HOST }}
-          token = ${{ secrets.DATABRICKS_TOKEN }}
-          EOF
-
       - name: Run Databricks Notebook
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks runs submit --json '{
             "run_name": "PR Trigger Run",
