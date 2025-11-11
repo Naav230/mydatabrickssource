@@ -1,4 +1,5 @@
 # Databricks notebook source
+#yui
 calendar = spark.read.option("header", "true").csv("/Volumes/myfirstcatalog/myfirstproduct/myfirstvolume/calendar.csv")
 
 calendar.write.format("delta").saveAsTable("myfirstcatalog.myfirstproduct.calendar",mode="overwrite")
