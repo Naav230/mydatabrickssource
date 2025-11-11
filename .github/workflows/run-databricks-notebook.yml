@@ -14,15 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Run notebook via Databricks action
+      - name: Run notebook on ephemeral cluster
         uses: databricks/run-notebook@v0.0.3
         with:
-          # Use workspace path of your notebook
-          workspace-notebook-path: '/Workspace/Sonjoy/processing/products/myfirstingestionnotebook'
-          run-name: 'PR Trigger Run'
-          new-cluster: |
+          run-name: "PR Trigger Run"
+          workspace-notebook-path: "/Workspace/Sonjoy/processing/products/myfirstingestionnotebook"
+          new-cluster-json: |
             {
               "spark_version": "13.3.x-scala2.12",
               "node_type_id": "Standard_DS3_v2",
-              "num_workers": 2
+              "num_workers": 1
             }
