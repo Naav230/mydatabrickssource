@@ -1,22 +1,30 @@
-steps:
-  - uses: actions/checkout@v3
-  - uses: databricks/setup-cli@main
+name: Check Databricks Path
 
-  - name: Check if Databricks workspace path exists
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-path:
+    runs-on: ubuntu-latest
     env:
       DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
       DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-    run: |
-      TARGET_PATH="/Workspace/Sonjoy"
-      PARENT_FOLDER=$(dirname "$TARGET_PATH")
-      FOLDER_NAME=$(basename "$TARGET_PATH")
+    steps:
+      - uses: actions/checkout@v3
+      - uses: databricks/setup-cli@main
 
-      echo "Checking if $TARGET_PATH exists in Databricks workspace..."
-      
-      # List the parent folder and search for the target folder
-      if databricks workspace list "$PARENT_FOLDER" | grep -q "$FOLDER_NAME"; then
-        echo "Folder $TARGET_PATH exists."
-      else
-        echo "Folder $TARGET_PATH does NOT exist!"
-        exit 1
-      fi
+      - name: Check if Databricks workspace path exists
+        run: |
+          TARGET_PATH="/Workspace/Sonjoy"
+          PARENT_FOLDER=$(dirname "$TARGET_PATH")
+          FOLDER_NAME=$(basename "$TARGET_PATH")
+
+          echo "Checking if $TARGET_PATH exists in Databricks workspace..."
+          
+          if databricks workspace list "$PARENT_FOLDER" | grep -q "$FOLDER_NAME"; then
+            echo "Folder $TARGET_PATH exists."
+          else
+            echo "Folder $TARGET_PATH does NOT exist!"
+            exit 1
+          fi
