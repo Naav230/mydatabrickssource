@@ -7,18 +7,17 @@ on:
 jobs:
   run-notebook:
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Install Databricks CLI
-        run: pip install databricks-cli
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
 
       - name: Run Databricks Notebook
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           databricks runs submit --json '{
             "run_name": "PR Trigger Run",
