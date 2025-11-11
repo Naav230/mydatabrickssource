@@ -17,25 +17,14 @@ jobs:
       - name: Check if Databricks workspace path exists and run notebook
         run: |
           TARGET_PATH="/Workspace/Sonjoy"
-          PARENT_FOLDER=$(dirname "$TARGET_PATH")
-          FOLDER_NAME=$(basename "$TARGET_PATH")
+          NOTEBOOK_PATH="/Workspace/Sonjoy/processing/products/myfirstingestionnotebook"
 
           echo "Checking if $TARGET_PATH exists in Databricks workspace..."
-          
-          if databricks workspace list "$PARENT_FOLDER" | grep -q "$FOLDER_NAME"; then
-            echo "Folder $TARGET_PATH exists. Running notebook..."
-            databricks runs submit --json '{
-              "run_name": "PR Trigger Run",
-              "new_cluster": {
-                "spark_version": "13.3.x-scala2.12",
-                "node_type_id": "Standard_DS3_v2",
-                "num_workers": 2
-              },
-              "notebook_task": {
-                "notebook_path": "/Workspace/Sonjoy/processing/products/myfirstingestionnotebook"
-              }
-            }'
+
+          if databricks workspace list "$(dirname "$TARGET_PATH")" | grep -q "$(basename "$TARGET_PATH")"; then
+            echo "✅ Folder $TARGET_PATH exists. Running notebook..."
+            databricks workspace run "$NOTEBOOK_PATH" --existing-cluster-id <your-cluster-id>
           else
-            echo "Folder $TARGET_PATH does NOT exist!"
+            echo "❌ Folder $TARGET_PATH does NOT exist!"
             exit 1
           fi
