@@ -1,0 +1,39 @@
+name: Run Databricks Notebook on Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  run-notebook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        run: pip install databricks-cli
+
+      - name: Configure Databricks CLI
+        run: |
+          mkdir -p ~/.databricks
+          cat <<EOF > ~/.databricks/config
+          [DEFAULT]
+          host = ${{ secrets.DATABRICKS_HOST }}
+          token = ${{ secrets.DATABRICKS_TOKEN }}
+          EOF
+
+      - name: Run Databricks Notebook
+        run: |
+          databricks runs submit --json '{
+            "run_name": "PR Trigger Run",
+            "new_cluster": {
+              "spark_version": "13.3.x-scala2.12",
+              "node_type_id": "Standard_DS3_v2",
+              "num_workers": 2
+            },
+            "notebook_task": {
+              "notebook_path": "/Workspace/Sonjoy/processing/products/myfirstingestionnotebook"
+            }
+          }'
